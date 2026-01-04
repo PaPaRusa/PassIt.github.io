@@ -182,8 +182,7 @@ export default async function AnalysisPage({ params }: { params: { id: string } 
   );
 }
 
-### `src/app/app/projects/page.tsx`
-`````````typescript
+
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Card } from '@/components/ui/Card';

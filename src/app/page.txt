@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   }
 
-### `src/app/product/page.tsx`
+"### `src/app/product/page.tsx`
 ````````````````````typescript
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -205,7 +205,7 @@ export default function ProductPage() {
     </div>
   );
 }
-
+"
 ### `src/app/pricing/page.tsx`
 ```````````````````typescript
 import { Header } from '@/components/layout/Header';
