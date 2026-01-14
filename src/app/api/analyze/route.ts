@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateMockAnalysis } from '@/lib/analyzers/mock-analyzer';
-import { generateOpenAIAnalysis } from '@/lib/analyzers/openai-analyzer';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +21,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify project ownership
     const { data: project } = await supabase
       .from('projects')
       .select('*')
@@ -34,34 +32,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // Generate analysis
-    let analysisResult;
-    try {
-      // Try OpenAI first if API key is available
-      if (process.env.OPENAI_API_KEY) {
-        analysisResult = await generateOpenAIAnalysis({
-          projectType: project.project_type,
-          buildingType,
-          jurisdiction,
-          permitType: permit_type,
-          inputText: input_text,
-        });
-      } else {
-        throw new Error('OpenAI not configured');
-      }
-    } catch (error) {
-      // Fall back to mock analyzer
-      console.log('Using mock analyzer:', error);
-      analysisResult = await generateMockAnalysis({
-        projectType: project.project_type,
-        buildingType,
-        jurisdiction,
-        permitType: permit_type,
-        inputText: input_text,
-      });
-    }
+    const analysisResult = await generateMockAnalysis({
+      projectType: project.project_type,
+      buildingType,
+      jurisdiction,
+      permitType: permit_type,
+      inputText: input_text,
+    });
 
-    // Store analysis in database
     const { data: analysis, error: insertError } = await supabase
       .from('analyses')
       .insert({
@@ -88,7 +66,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save analysis' }, { status: 500 });
     }
 
-    // Log audit event
     await supabase.from('audit_logs').insert({
       user_id: user.id,
       event_type: 'analysis_created',
